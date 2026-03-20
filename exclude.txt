@@ -1,0 +1,6 @@
+# Add spots according to the example formatting below.
+# Spots added here will not be taken into consideration in sample-level calculations.
+ 
+184343-29-1
+184343-25-1
+231142-14-1
