@@ -543,7 +543,7 @@ def calc_group_stats(df: pd.DataFrame, grouping_var: str, variable: str, variabl
   ))
   
   headers = [
-      "MDN","1SIG","AVE","1SD","MAX","MIN","WEIGHTEDMEAN","WEIGHTEDMEAN_UNC"
+      "MDN","1SIG","AVE","1SD","MAX","MIN","WEIGHTEDMEAN","WEIGHTEDMEAN_95_pct_CI"
   ]
   
   index = sample_weighted_mean.index

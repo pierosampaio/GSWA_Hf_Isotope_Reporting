@@ -124,7 +124,9 @@ def main():
   
   
   #### Bit botched, have to check how to proceed regarding these uncertainties
-  df_merged["Hf176Hf177_1sig"] = df_merged["Hf176Hf177_2SE"]
+  #df_merged["Hf176Hf177_1sig"] = df_merged["Hf176Hf177_2SE"]
+  df_merged["Hf176Hf177_1SE"] = df_merged["Hf176Hf177_2SE"]/2
+
   
   df_merged["Hf176Hf177_init"] = df_merged.apply(
       lambda s: calc_initial_ratios(
@@ -134,9 +136,9 @@ def main():
       ), axis = 1
   )
   
-  df_merged["Hf176Hf177_init_1sig"] = df_merged.apply(
+  df_merged["Hf176Hf177_init_1SE"] = df_merged.apply(
       lambda s: initial_ratio_uncertainty(
-          s["Hf176Hf177_1sig"]
+          s["Hf176Hf177_1SE"]
       ), axis = 1
   )
   
@@ -148,9 +150,9 @@ def main():
       ), axis = 1
   )
   
-  df_merged["epsilon_Hf_1sig"] = df_merged.apply(
+  df_merged["epsilon_Hf_1SE"] = df_merged.apply(
       lambda s: epsilon_Hf_uncertainty(
-          s["Hf176Hf177_1sig"],
+          s["Hf176Hf177_1SE"],
           s["Age_Hf_calculation"]
       ), axis = 1
   )
@@ -171,7 +173,6 @@ def main():
   
  
 
-
 ###############################################################################
 ################################ WAGIMS_EXPORT ################################
 
@@ -183,7 +184,7 @@ def main():
       "Discordance_pct","Material analysed","LU_HF_ANALYSIS_ID","Age_Hf_calculation",
       "Age_Hf_calculation_unc","Hf176Hf177","Hf176Hf177_2SE","Hf178Hf177","Hf178Hf177_2SE",
       "Lu176Hf177","Lu176Hf177_2SE","Yb176Hf177","Yb176Hf177_2SE","Comment",
-      "Hf176Hf177_init","Hf176Hf177_init_1sig","epsilon_Hf","epsilon_Hf_1sig","TDM_2Stage",
+      "Hf176Hf177_init","Hf176Hf177_init_1SE","epsilon_Hf","epsilon_Hf_1SE","TDM_2Stage",
       "TCR"
   ]
   
@@ -198,7 +199,7 @@ def main():
       "176Hf/177Hf measured", "176Hf/177Hf measured 2SE", "178Hf/177Hf measured",
       "178Hf/177Hf measured 2SE", "176Lu/177Hf measured", "176Lu/177Hf measured 2SE",
       "176Yb/177Hf measured", "176Yb/177Hf measured 1 sigma", "Comment", "176Hf/177Hf initial",
-      "176Hf/177Hf initial 2SE", "Epsilon Hf(i)", "Epsilon Hf(i) 1 sigma", "TDM2 (Ma)",
+      "176Hf/177Hf initial 1SE", "Epsilon Hf(i)", "Epsilon Hf(i) 1SE", "TDM2 (Ma)",
       "TCR (Ma)"
   ]
   
