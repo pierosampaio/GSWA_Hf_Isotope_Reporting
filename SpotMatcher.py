@@ -572,7 +572,7 @@ def main():
     
     
     variables = ["epsilon_Hf", "TDM_2Stage", "TCR"]
-    uncertainties = ["epsilon_Hf_1sig", "TDM_2Stage_5pctUnc", "TCR_5pctUnc"]
+    uncertainties = ["epsilon_Hf_1SE", "TDM_2Stage_5pctUnc", "TCR_5pctUnc"]
     prepends = ["EHFI", "TDM_2Stage_Vervoort2018", "TCR"]
     
     
