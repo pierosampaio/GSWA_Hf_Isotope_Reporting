@@ -243,7 +243,6 @@ def UPb_xls_process(UPb_path,UPb_file):
   }
 
   df = pd.read_excel(os.path.join(UPb_path,UPb_file), sheet_name = found_sheet, skiprows = skiprows[found_sheet])
-
   ## Sanitise dataframe
   df = df.iloc[:,:20]
   df = df.dropna(axis=0)
@@ -320,7 +319,7 @@ def UPb_txt_process(UPb_path,UPb_file):
      "Grain spot":"UPB_ANALYSIS_ID",
      "grain spot":"UPB_ANALYSIS_ID",
      "Grp no":"Grp_ID",
-     "Grp_no","Grp_ID",
+     "Grp_no":"Grp_ID",
      "Grp ID":"Grp_ID"
      },
      axis = 1)
