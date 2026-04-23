@@ -533,13 +533,15 @@ def calc_group_stats(df: pd.DataFrame, grouping_var: str, variable: str, variabl
   sample_weighted_mean = pd.DataFrame.from_dict(sample_weighted_mean.to_dict(), orient="index")
   wm = sample_weighted_mean["mean"]
   uncertainty = sample_weighted_mean["uncertainty"]
+  mswd = sample_weighted_mean["mswd"].round(2)
+  n = sample_weighted_mean["n"]	
   
   data = np.array((
-      median,median_1sigma,average,std,maxx,min,wm,uncertainty
+      median,median_1sigma,average,std,maxx,min,wm,uncertainty,n,mswd
   ))
   
   headers = [
-      "MDN","1SIG","AVE","1SD","MAX","MIN","WEIGHTEDMEAN","WEIGHTEDMEAN_95_pct_CI"
+      "MDN","1SIG","AVE","1SD","MAX","MIN","WEIGHTEDMEAN","WEIGHTEDMEAN_95_pct_CI","PRIMARY_N,"MSWD"
   ]
   
   index = sample_weighted_mean.index
