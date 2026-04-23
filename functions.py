@@ -70,7 +70,7 @@ def filter_by_regex(strings, pattern):
     elif not matches: return None
     else: print(matches)
 
-
+def LuHf_process(LuHf_file, Sample_list = None):
 """
     Ensure the input spreadsheets have the columns in the following order:
     1: Sample/spot
