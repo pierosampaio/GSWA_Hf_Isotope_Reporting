@@ -71,7 +71,8 @@ def filter_by_regex(strings, pattern):
     else: print(matches)
 
 def LuHf_process(LuHf_file, Sample_list = None):
-"""
+    
+    """
     Ensure the input spreadsheets have the columns in the following order:
     1: Sample/spot
     2: Duration
@@ -132,22 +133,17 @@ def LuHf_process(LuHf_file, Sample_list = None):
     df["Sample"] = SampleName
     df = df.loc[~df.Sample.str.contains("FC1|MTZ|MUN|OGC|91500")]
     
-      
-    
-    
     df = df.dropna(
       subset = duration_col, axis = 0
     )
     
     df = df.loc[:,~df.columns.str.startswith("Unnamed")]
     
-    
     col_names = [
       "Duration","Hf176Hf177","Hf176Hf177_2SE","Lu176Hf177","Lu176Hf177_2SE",
       "Yb176Hf177","Yb176Hf177_2SE","Hf178Hf177","Hf178Hf177_2SE",
       "Total_Beam","TK_comment","Sample"
     ]
-    
     
     df = df.rename(
       dict(zip(df.columns,col_names)),
@@ -157,9 +153,7 @@ def LuHf_process(LuHf_file, Sample_list = None):
     
     df = df.dropna(axis = 0, how = "all")
     #df = df.dropna(axis = 1, how = "any")
-    
-    
-    
+
     if Sample_list:
         # Match shortened names in the analysis index to the full sample names
         # Remove extensions
@@ -171,14 +165,14 @@ def LuHf_process(LuHf_file, Sample_list = None):
         for df_sample in df["Sample"].unique():
           # Find all full sample names that end with this df_sample
         
-          matches = [full for full in full_samples if full.endswith(df_sample)]
-        
-          if len(matches) == 1:
+            matches = [full for full in full_samples if full.endswith(df_sample)]
+
+            if len(matches) == 1:
                 rename_dict[df_sample] = matches[0]
-          elif len(matches) > 1:
-              # If multiple matches, choose the longest (most specific)
+            elif len(matches) > 1:
+            # If multiple matches, choose the longest (most specific)
                 rename_dict[df_sample] = max(matches, key=len)
-          # else: no match → leave unchanged
+            # else: no match → leave unchanged
         
         df["Sample"] = df["Sample"].replace(rename_dict)
     
@@ -197,9 +191,7 @@ def LuHf_process(LuHf_file, Sample_list = None):
     )
     
     df["SampleSpot"] = df["SampleSpot"].str.replace(".","-")
-    
-    
-    
+
     mask = df["SampleSpot"].astype("str").str.match(r".+-\d+$") & ~df["SampleSpot"].astype("str").str.match(r".+-\d+-\d+$")
     
     df.loc[mask, "SampleSpot"] += "-1"
@@ -214,62 +206,8 @@ def LuHf_process(LuHf_file, Sample_list = None):
     
     return df
 
-def UPb_xls_process(UPb_path,UPb_file):
-
-  header = [
-      "GroupID","SpotNo","GrainSpot","238U_ppm","232Th_ppm",
-      "Th232U238","f204_pct","U238Pb206","U238Pb206_1sig",
-      "Pb207Pb206","Pb207Pb206_1sig","4corr_U238Pb206",
-      "4corr_U238Pb206_1sig","4corr_Pb207Pb206","4corr_Pb207Pb206_1sig",
-      "4corr_86_date","4corr_86_date_1sig","4corr_76_date",
-      "4corr_76_date_1sig","Discordance_pct"
-  ]
-
-  Sample_name = UPb_file.split(".")[0]
-  Sample_name = Sample_name.removesuffix("-combined")
-
-  xl = pd.ExcelFile(os.path.join(UPb_path,UPb_file))
-  sheet_names = xl.sheet_names
-  target_sheets = ["excel_table","data_table"]
-  found_sheet = next((s for s in target_sheets if s in sheet_names), None)
-  skiprows = {
-      "excel_table":1,
-      "data_table":4
-  }
-
-  df = pd.read_excel(os.path.join(UPb_path,UPb_file), sheet_name = found_sheet, skiprows = skiprows[found_sheet])
-  ## Sanitise dataframe
-  df = df.iloc[:,:20]
-  df = df.dropna(axis=0)
 
 
-  df = df.rename(
-  dict(zip(df.columns,header)),
-  axis=1
-  )
-  
-  
-
-  if found_sheet == "data_table":
-      df["Spot"] = [str(v).replace(".","-") for v in df["GrainSpot"].values]
-  elif found_sheet == "excel_table":
-      df["Spot"] = df["GrainSpot"].str.split("-", expand=True)[1].str.replace(".","-")
-
-  
-  df["UPB_ANALYSIS_ID"] = df.GrainSpot
-  
-
-  df["Sample"] = Sample_name
-  
-  df["SampleSpot"] = (df["Sample"] + "-" + df["Spot"])
-
-  df["SampleSpot"] = df["SampleSpot"].str.replace(".","-")
-
-  df["SpotNo"] = df["SpotNo"].astype("int").astype("string")
-  
-  
-  
-  return(df)
 
 
 def UPb_txt_process(UPb_path,UPb_file):
