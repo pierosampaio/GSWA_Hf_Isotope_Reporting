@@ -71,153 +71,148 @@ def filter_by_regex(strings, pattern):
     else: print(matches)
 
 
-def LuHf_process(LuHf_file, Sample_list = None):
-  
-  """
-  Ensure the input spreadsheets have the columns in the following order:
-  1: Sample/spot
-  2: Duration
-  3: 176Hf/177Hf
-  4: 176Hf/177Hf 2SE
-  5: 176Lu/177Hf
-  6: 176Lu/177Hf 2SE
-  7: 176Yb/177Hf
-  8: 176Yb/177Hf 2SE
-  9: 178Hf/177Hf
-  10: 178Hf/177Hf 2SE
-  11: Total Hf (V)
-  12: TK comment (optional) - will be created if not present
-  """
-
-  
-  
-  # Read all sheets into a dictionary of DataFrames
-  all_sheets = pd.read_excel(LuHf_file, sheet_name=None)
-  
-  # Concatenate them into one DataFrame
-  df = pd.concat(all_sheets.values(), ignore_index=True)
-  
-  # Get rid of skipped rows
-  df = df.dropna(how="all",axis=0)
-
-  df = df.set_index("Sample/spot")
-
-  pattern = r"(?i)^duration(\s*\(s\))?$"
-  duration_col = filter_by_regex(list(df.columns),pattern)
-
-  if duration_col == None:
-      duration_col = "Duration"
-      df.insert(loc=0, column=duration_col, value=np.zeros(len(df)))
-
-  # Ensure the existence of TK comment column
-  if "TK comment" not in df.columns:
-      placeholdercol = np.empty(len(df))
-      df["TK comment"] = placeholdercol.fill(np.nan)
-
-  df = df.loc[~df.index.str.contains("FC1|MTZ|MUN|OGC|91500")]
-
-  
-  # Create sample column
-  SampleName = []
-  
-  for i, idx in enumerate(df.index):
-      base_str = str(idx).rsplit("-",1)[0]
-      pattern = r"(?i)^[a-z].*"
-      if re.match(pattern, base_str):
-          new_str = str(idx).rsplit("-",1)[0].split("-")[-1]
-      else:
-          new_str = str(idx).rsplit("-",1)[0].split("-")[0]
+"""
+    Ensure the input spreadsheets have the columns in the following order:
+    1: Sample/spot
+    2: Duration
+    3: 176Hf/177Hf
+    4: 176Hf/177Hf 2SE
+    5: 176Lu/177Hf
+    6: 176Lu/177Hf 2SE
+    7: 176Yb/177Hf
+    8: 176Yb/177Hf 2SE
+    9: 178Hf/177Hf
+    10: 178Hf/177Hf 2SE
+    11: Total Hf (V)
+    12: TK comment (optional) - will be created if not present
+    """
+    
+    
+    
+    # Read all sheets into a dictionary of DataFrames
+    all_sheets = pd.read_excel(LuHf_file, sheet_name=None)
+    
+    # Concatenate them into one DataFrame
+    df = pd.concat(all_sheets.values(), ignore_index=True)
+    
+    # Get rid of skipped rows
+    df = df.dropna(how="all",axis=0)
+    
+    df = df.set_index("Sample/spot")
+    
+    pattern = r"(?i)^duration(\s*\(s\))?$"
+    duration_col = filter_by_regex(list(df.columns),pattern)
+    
+    if duration_col == None:
+        duration_col = "Duration"
+        df.insert(loc=0, column=duration_col, value=np.zeros(len(df)))
+    
+    # Ensure the existence of TK comment column
+    if "TK comment" not in df.columns:
+        placeholdercol = np.empty(len(df))
+        df["TK comment"] = placeholdercol.fill(np.nan)
+    
+    df = df.loc[~df.index.str.contains("FC1|MTZ|MUN|OGC|91500")]
+    
+    
+    # Create sample column
+    SampleName = []
+    
+    for i, idx in enumerate(df.index):
+        base_str = str(idx).rsplit("-",1)[0]
+        pattern = r"(?i)^[a-z].*"
+        if re.match(pattern, base_str):
+            new_str = str(idx).rsplit("-",1)[0].split("-")[-1]
+        else:
+            new_str = str(idx).rsplit("-",1)[0].split("-")[0]
       
-      SampleName.append(new_str)
-
-  
-  df["Sample"] = SampleName
-  df = df.loc[~df.Sample.str.contains("FC1|MTZ|MUN|OGC|91500")]
-
+        SampleName.append(new_str)
+    
+    
+    df["Sample"] = SampleName
+    df = df.loc[~df.Sample.str.contains("FC1|MTZ|MUN|OGC|91500")]
+    
       
-
-  
-  df = df.dropna(
+    
+    
+    df = df.dropna(
       subset = duration_col, axis = 0
-  )
-  
-  df = df.loc[:,~df.columns.str.startswith("Unnamed")]
-  
-
-  col_names = [
+    )
+    
+    df = df.loc[:,~df.columns.str.startswith("Unnamed")]
+    
+    
+    col_names = [
       "Duration","Hf176Hf177","Hf176Hf177_2SE","Lu176Hf177","Lu176Hf177_2SE",
       "Yb176Hf177","Yb176Hf177_2SE","Hf178Hf177","Hf178Hf177_2SE",
       "Total_Beam","TK_comment","Sample"
-  ]
-  
-
-  df = df.rename(
+    ]
+    
+    
+    df = df.rename(
       dict(zip(df.columns,col_names)),
       axis = 1
-  )
-
-
-  df = df.dropna(axis = 0, how = "all")
-  #df = df.dropna(axis = 1, how = "any")
-  
-  
-
-  if Sample_list:
-      # Match shortened names in the analysis index to the full sample names
-      # Remove extensions
-      
-      full_samples = [samp.split(".")[0] for samp in Sample_list]
-  
-      rename_dict = {}
-
-      print(df.head())
-      
+    )
     
-      for df_sample in df["Sample"].unique():
+    
+    df = df.dropna(axis = 0, how = "all")
+    #df = df.dropna(axis = 1, how = "any")
+    
+    
+    
+    if Sample_list:
+        # Match shortened names in the analysis index to the full sample names
+        # Remove extensions
+        
+        full_samples = [samp.split(".")[0] for samp in Sample_list]
+        
+        rename_dict = {}      
+    
+        for df_sample in df["Sample"].unique():
           # Find all full sample names that end with this df_sample
-      
+        
           matches = [full for full in full_samples if full.endswith(df_sample)]
-  
+        
           if len(matches) == 1:
-              rename_dict[df_sample] = matches[0]
+                rename_dict[df_sample] = matches[0]
           elif len(matches) > 1:
               # If multiple matches, choose the longest (most specific)
-              rename_dict[df_sample] = max(matches, key=len)
+                rename_dict[df_sample] = max(matches, key=len)
           # else: no match → leave unchanged
-  
-      df["Sample"] = df["Sample"].replace(rename_dict)
-
-      print("Samples in Lu-Hf dataset:")
-      print("\n".join(list(df.Sample.unique())))
-      print("\n")
-
-  df["Spot"] = df.index.values
-  df = df.rename_axis("id", axis = 0)
-  
-
-  df["SampleSpot"] = df.apply(
-        lambda r: "-".join([
-        r["Sample"],
-        *r["Spot"].split("-")[1:]   
-        ]),axis=1)
-
-  df["SampleSpot"] = df["SampleSpot"].str.replace(".","-")
-
-  
-
-  mask = df["SampleSpot"].astype("str").str.match(r".+-\d+$") & ~df["SampleSpot"].astype("str").str.match(r".+-\d+-\d+$")
-
-  df.loc[mask, "SampleSpot"] += "-1"
-
-  df["SampleSpot"] = df["SampleSpot"].astype("str").str.removeprefix("GSWA_")
-  df = df.rename({"Spot":"LU_HF_ANALYSIS_ID"},axis=1)
-  try:
-      df = df.drop("Standards")
-      df = df.drop("TK_comment",axis=1)
-  except:
-      pass
-  
-  return df
+        
+        df["Sample"] = df["Sample"].replace(rename_dict)
+    
+        print("Samples in Lu-Hf dataset:")
+        print("\n".join(list(df.Sample.unique())))
+        print("\n")
+    
+    df["Spot"] = df.index.values
+    df = df.rename_axis("id", axis = 0)
+    
+    
+    df["SampleSpot"] = (
+      df["Sample"].astype(str)
+      + "-"
+      + df["Spot"].str.split("-").str[-1]
+    )
+    
+    df["SampleSpot"] = df["SampleSpot"].str.replace(".","-")
+    
+    
+    
+    mask = df["SampleSpot"].astype("str").str.match(r".+-\d+$") & ~df["SampleSpot"].astype("str").str.match(r".+-\d+-\d+$")
+    
+    df.loc[mask, "SampleSpot"] += "-1"
+    
+    df["SampleSpot"] = df["SampleSpot"].astype("str").str.removeprefix("GSWA_")
+    df = df.rename({"Spot":"LU_HF_ANALYSIS_ID"},axis=1)
+    try:
+        df = df.drop("Standards")
+        df = df.drop("TK_comment",axis=1)
+    except:
+        pass
+    
+    return df
 
 def UPb_xls_process(UPb_path,UPb_file):
 
